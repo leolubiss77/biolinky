@@ -1,33 +1,116 @@
-import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
+'use client'
+
+import { useEffect, useState, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function PublicBioPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const { slug } = await params
-  const supabase = await createClient()
+type PageLink = {
+  id: string
+  title: string
+  url: string
+  thumbnail_url: string | null
+  clicks: number
+  is_active: boolean
+  order_position: number
+}
 
-  // Fetch page data
-  const { data: page, error: pageError } = await supabase
-    .from('pages')
-    .select('*')
-    .eq('slug', slug)
-    .single()
+type PageData = {
+  id: string
+  slug: string
+  title: string
+  description: string | null
+  theme_color: string
+  background_value: string
+}
 
-  if (pageError || !page) {
-    notFound()
+export default function PublicBioPage() {
+  const params = useParams()
+  const slug = params.slug as string
+  const supabase = createClient()
+
+  const [page, setPage] = useState<PageData | null>(null)
+  const [links, setLinks] = useState<PageLink[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchPageData = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const { data: pageData, error: pageError } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('slug', slug)
+        .single()
+
+      if (pageError || !pageData) {
+        setError('Halaman tidak ditemukan')
+        setPage(null)
+        setLinks([])
+        return
+      }
+
+      setPage(pageData)
+
+      const { data: linksData } = await supabase
+        .from('page_links')
+        .select('*')
+        .eq('page_id', pageData.id)
+        .eq('is_active', true)
+        .order('order_position', { ascending: true })
+
+      setLinks(linksData || [])
+    } catch (error) {
+      console.error('Error:', error)
+      setError('Terjadi kesalahan saat memuat halaman')
+    } finally {
+      setLoading(false)
+    }
+  }, [slug, supabase])
+
+  useEffect(() => {
+    fetchPageData()
+  }, [fetchPageData])
+
+  const handleLinkClick = async (linkId: string) => {
+    try {
+      const { error } = await supabase.rpc('increment_link_clicks', {
+        link_id: linkId
+      })
+
+      if (error) {
+        console.error('Error tracking click:', error)
+      }
+    } catch (error) {
+      console.error('Error tracking click:', error)
+    }
   }
 
-  // Fetch links
-  const { data: links } = await supabase
-    .from('page_links')
-    .select('*')
-    .eq('page_id', page.id)
-    .eq('is_active', true)
-    .order('order_position', { ascending: true })
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    )
+  }
+
+  if (error || !page) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="text-gray-500 mb-4">{error || 'Halaman tidak ditemukan'}</div>
+          <Link
+            href="/"
+            className="inline-block text-sm text-blue-600 hover:text-blue-800 transition"
+          >
+            Kembali ke halaman utama
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -55,45 +138,44 @@ export default async function PublicBioPage({
               <p className="text-gray-500">Belum ada link yang ditambahkan</p>
             </div>
           ) : (
-            links.map((link: any) => {
-              return (
-                <a
-                  key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block bg-white/90 backdrop-blur-sm hover:bg-white rounded-2xl p-4 transition shadow-md hover:shadow-xl transform hover:-translate-y-1"
-                  style={{ borderLeft: `4px solid ${page.theme_color || '#3b82f6'}` }}
-                >
-                  <div className="flex items-center gap-4">
-                    {link.thumbnail_url && (
-                      <img
-                        src={link.thumbnail_url}
-                        alt={link.title}
-                        className="w-12 h-12 rounded-lg object-cover"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{link.title}</h3>
-                      <p className="text-sm text-gray-500 truncate">{link.url}</p>
-                    </div>
-                    <svg
-                      className="w-5 h-5 text-gray-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
+            links.map((link) => (
+              <a
+                key={link.id}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => handleLinkClick(link.id)}
+                className="block bg-white/90 backdrop-blur-sm hover:bg-white rounded-2xl p-4 transition shadow-md hover:shadow-xl transform hover:-translate-y-1"
+                style={{ borderLeft: `4px solid ${page.theme_color || '#3b82f6'}` }}
+              >
+                <div className="flex items-center gap-4">
+                  {link.thumbnail_url && (
+                    <img
+                      src={link.thumbnail_url}
+                      alt={link.title}
+                      className="w-12 h-12 rounded-lg object-cover"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{link.title}</h3>
+                    <p className="text-sm text-gray-500 truncate">{link.url}</p>
                   </div>
-                </a>
-              )
-            })
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </a>
+            ))
           )}
         </div>
 
