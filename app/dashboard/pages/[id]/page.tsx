@@ -11,6 +11,7 @@ type PageLink = {
   title: string
   url: string
   thumbnail_url: string | null
+  clicks: number
   is_active: boolean
   order_position: number
 }
@@ -339,6 +340,77 @@ export default function EditPagePage() {
             {saving ? 'Menyimpan...' : '💾 Simpan Pengaturan'}
           </button>
         </form>
+      </div>
+
+      {/* Analytics Section */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h3 className="text-xl font-semibold mb-4">📊 Analytics</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Total Links */}
+          <div className="bg-blue-50 rounded-lg p-4">
+            <p className="text-sm text-blue-600 font-medium">Total Links</p>
+            <p className="text-3xl font-bold text-blue-900">{links.length}</p>
+          </div>
+
+          {/* Total Clicks */}
+          <div className="bg-green-50 rounded-lg p-4">
+            <p className="text-sm text-green-600 font-medium">Total Clicks</p>
+            <p className="text-3xl font-bold text-green-900">
+              {links.reduce((sum, link) => sum + (link.clicks || 0), 0)}
+            </p>
+          </div>
+
+          {/* Most Clicked */}
+          <div className="bg-purple-50 rounded-lg p-4">
+            <p className="text-sm text-purple-600 font-medium">Most Clicked Link</p>
+            <p className="text-lg font-bold text-purple-900 truncate">
+              {links.length > 0 
+                ? [...links].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0]?.title || '-'
+                : '-'
+              }
+            </p>
+            <p className="text-xs text-purple-600">
+              {links.length > 0 
+                ? `${[...links].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0]?.clicks || 0} clicks`
+                : '0 clicks'
+              }
+            </p>
+          </div>
+        </div>
+
+        {/* Top Links Chart */}
+        <div className="mt-6">
+          <h4 className="text-sm font-semibold text-gray-700 mb-3">Top Performing Links</h4>
+          <div className="space-y-3">
+            {[...links]
+              .sort((a, b) => (b.clicks || 0) - (a.clicks || 0))
+              .slice(0, 5)
+              .map((link) => {
+                const maxClicks = Math.max(...links.map(l => l.clicks || 0), 1)
+                const percentage = ((link.clicks || 0) / maxClicks) * 100
+                
+                return (
+                  <div key={link.id} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="font-medium text-gray-700 truncate max-w-xs">
+                        {link.title}
+                      </span>
+                      <span className="text-gray-600 font-semibold">
+                        {link.clicks || 0} clicks
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+          </div>
+        </div>
       </div>
 
       {/* QR Code Section */}
