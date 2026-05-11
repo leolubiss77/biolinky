@@ -14,6 +14,8 @@ type PageLink = {
   clicks: number
   is_active: boolean
   order_position: number
+  start_date: string | null
+  end_date: string | null
 }
 
 type PageData = {
@@ -158,6 +160,8 @@ export default function EditPagePage() {
           title: editingLink.title,
           url: editingLink.url,
           thumbnail_url: editingLink.thumbnail_url,
+          start_date: editingLink.start_date,
+          end_date: editingLink.end_date,
         })
         .eq('id', editingLink.id)
 
@@ -672,8 +676,26 @@ export default function EditPagePage() {
                   />
                 )}
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">{link.title}</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-semibold text-gray-900">{link.title}</h4>
+                    {(link.start_date || link.end_date) && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                        ⏰ Scheduled
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500 truncate">{link.url}</p>
+                  {(link.start_date || link.end_date) && (
+                    <div className="text-xs text-gray-400 mt-1">
+                      {link.start_date && (
+                        <span>From: {new Date(link.start_date).toLocaleDateString()}</span>
+                      )}
+                      {link.start_date && link.end_date && <span> • </span>}
+                      {link.end_date && (
+                        <span>Until: {new Date(link.end_date).toLocaleDateString()}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -746,6 +768,66 @@ export default function EditPagePage() {
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+
+              {/* Scheduling Section */}
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3">
+                  ⏰ Schedule Link (Optional)
+                </h4>
+                <p className="text-xs text-gray-500 mb-3">
+                  Set when this link should be visible. Leave empty to always show.
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Start Date & Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={editingLink.start_date ? new Date(editingLink.start_date).toISOString().slice(0, 16) : ''}
+                      onChange={(e) =>
+                        setEditingLink({
+                          ...editingLink,
+                          start_date: e.target.value ? new Date(e.target.value).toISOString() : null,
+                        })
+                      }
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      {editingLink.start_date ? '✅ Scheduled' : 'Always visible'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      End Date & Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={editingLink.end_date ? new Date(editingLink.end_date).toISOString().slice(0, 16) : ''}
+                      onChange={(e) =>
+                        setEditingLink({
+                          ...editingLink,
+                          end_date: e.target.value ? new Date(e.target.value).toISOString() : null,
+                        })
+                      }
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      {editingLink.end_date ? '✅ Scheduled' : 'No expiration'}
+                    </p>
+                  </div>
+                </div>
+                {editingLink.start_date && editingLink.end_date && (
+                  <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-2">
+                    <p className="text-xs text-blue-800">
+                      📅 This link will be visible from{' '}
+                      <strong>{new Date(editingLink.start_date).toLocaleString()}</strong>
+                      {' '}to{' '}
+                      <strong>{new Date(editingLink.end_date).toLocaleString()}</strong>
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-2">
