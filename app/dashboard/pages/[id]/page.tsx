@@ -785,21 +785,13 @@ export default function EditPagePage() {
                     </label>
                     <input
                       type="datetime-local"
-                      value={editingLink.start_date
-                        ? new Date(new Date(editingLink.start_date).getTime() - new Date(editingLink.start_date).getTimezoneOffset() * 60000)
-                            .toISOString()
-                            .slice(0, 16)
-                        : ''
+                      value={editingLink.start_date?.slice(0, 16) || ''}
+                      onChange={(e) =>
+                        setEditingLink({
+                          ...editingLink,
+                          start_date: e.target.value || null,
+                        })
                       }
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          const localDate = new Date(e.target.value)
-                          const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
-                          setEditingLink({ ...editingLink, start_date: utcDate.toISOString() })
-                        } else {
-                          setEditingLink({ ...editingLink, start_date: null })
-                        }
-                      }}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     <p className="text-xs text-gray-400 mt-1">
@@ -812,21 +804,13 @@ export default function EditPagePage() {
                     </label>
                     <input
                       type="datetime-local"
-                      value={editingLink.end_date
-                        ? new Date(new Date(editingLink.end_date).getTime() - new Date(editingLink.end_date).getTimezoneOffset() * 60000)
-                            .toISOString()
-                            .slice(0, 16)
-                        : ''
+                      value={editingLink.end_date?.slice(0, 16) || ''}
+                      onChange={(e) =>
+                        setEditingLink({
+                          ...editingLink,
+                          end_date: e.target.value || null,
+                        })
                       }
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          const localDate = new Date(e.target.value)
-                          const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000)
-                          setEditingLink({ ...editingLink, end_date: utcDate.toISOString() })
-                        } else {
-                          setEditingLink({ ...editingLink, end_date: null })
-                        }
-                      }}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     <p className="text-xs text-gray-400 mt-1">
