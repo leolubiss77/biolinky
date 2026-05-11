@@ -14,6 +14,8 @@ type PageLink = {
   clicks: number
   is_active: boolean
   order_position: number
+  start_date: string | null
+  end_date: string | null
 }
 
 type PageData = {
@@ -140,7 +142,14 @@ export default function PublicBioPage() {
               <p className="text-gray-500">Belum ada link yang ditambahkan</p>
             </div>
           ) : (
-            links.map((link) => (
+            links
+              .filter((link) => {
+                const now = new Date()
+                if (link.start_date && new Date(link.start_date) > now) return false
+                if (link.end_date && new Date(link.end_date) < now) return false
+                return true
+              })
+              .map((link) => (
               <a
                 key={link.id}
                 href={link.url}
