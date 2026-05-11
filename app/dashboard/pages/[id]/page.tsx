@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import QRCode from 'qrcode'
+import toast, { Toaster } from 'react-hot-toast'
 
 type PageLink = {
   id: string
@@ -98,7 +99,7 @@ export default function EditPagePage() {
       setLinks(linksData || [])
     } catch (error) {
       console.error('Error:', error)
-      alert('Failed to load page data')
+      toast.error('Failed to load page data')
     } finally {
       setLoading(false)
     }
@@ -119,12 +120,12 @@ export default function EditPagePage() {
 
       if (error) throw error
 
-      alert('Link berhasil ditambahkan!')
+      toast.success('Link berhasil ditambahkan!')
       setNewLink({ title: '', url: '', thumbnail_url: '' })
       setShowAddForm(false)
       fetchPageData()
     } catch (error: any) {
-      alert(error.message)
+      toast.error(error.message)
     } finally {
       setSaving(false)
     }
@@ -141,10 +142,10 @@ export default function EditPagePage() {
 
       if (error) throw error
 
-      alert('Link berhasil dihapus!')
+      toast.success('Link berhasil dihapus!')
       fetchPageData()
     } catch (error: any) {
-      alert(error.message)
+      toast.error(error.message)
     }
   }
 
@@ -167,11 +168,11 @@ export default function EditPagePage() {
 
       if (error) throw error
 
-      alert('Link berhasil diupdate!')
+      toast.success('Link berhasil diupdate!')
       setEditingLink(null)
       fetchPageData()
     } catch (error: any) {
-      alert(error.message)
+      toast.error(error.message)
     } finally {
       setSaving(false)
     }
@@ -196,10 +197,10 @@ export default function EditPagePage() {
 
       if (error) throw error
 
-      alert('Pengaturan page berhasil diupdate!')
+      toast.success('Pengaturan page berhasil diupdate!')
       fetchPageData()
     } catch (error: any) {
-      alert(error.message)
+      toast.error(error.message)
     } finally {
       setSaving(false)
     }
@@ -223,7 +224,7 @@ export default function EditPagePage() {
       setQrCodeUrl(qrDataUrl)
     } catch (error) {
       console.error('Error generating QR code:', error)
-      alert('Failed to generate QR code')
+      toast.error('Failed to generate QR code')
     }
   }
 
@@ -250,6 +251,7 @@ export default function EditPagePage() {
 
   return (
     <div>
+      <Toaster position="top-right" />
       {/* Header */}
       <div className="mb-8">
         <Link
