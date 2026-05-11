@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { getSocialIcon } from '@/lib/utils/getSocialIcon'
+import { motion } from 'framer-motion'
 
 type PageLink = {
   id: string
@@ -150,14 +151,19 @@ export default function PublicBioPage() {
                 return true
               })
               .map((link) => (
-              <a
+              <motion.a
                 key={link.id}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => handleLinkClick(link.id)}
-                className="block bg-white/90 backdrop-blur-sm hover:bg-white rounded-2xl p-4 transition shadow-md hover:shadow-xl transform hover:-translate-y-1"
+                className="block bg-white/90 backdrop-blur-sm hover:bg-white rounded-2xl p-4 shadow-md"
                 style={{ borderLeft: `4px solid ${page.theme_color || '#3b82f6'}` }}
+                whileHover={{ scale: 1.02, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
               >
                 <div className="flex items-center gap-4">
                   <div className="relative flex-shrink-0">
@@ -212,7 +218,7 @@ export default function PublicBioPage() {
                     />
                   </svg>
                 </div>
-              </a>
+              </motion.a>
             ))
           )}
         </div>
