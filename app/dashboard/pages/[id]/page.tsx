@@ -53,6 +53,7 @@ export default function EditPagePage() {
   const [pageThemeColor, setPageThemeColor] = useState('#3b82f6')
   const [pageBackgroundType, setPageBackgroundType] = useState('solid')
   const [pageBackgroundValue, setPageBackgroundValue] = useState('#ffffff')
+  const [hideBranding, setHideBranding] = useState(false)
 
   // QR Code state
   const [qrCodeUrl, setQrCodeUrl] = useState('')
@@ -82,6 +83,7 @@ export default function EditPagePage() {
       setPageThemeColor(pageData.theme_color || '#3b82f6')
       setPageBackgroundType(pageData.background_type || 'solid')
       setPageBackgroundValue(pageData.background_value || '#ffffff')
+      setHideBranding(pageData.hide_branding || false)
 
       // Fetch links
       const { data: linksData, error: linksError } = await supabase
@@ -184,6 +186,7 @@ export default function EditPagePage() {
           theme_color: pageThemeColor,
           background_type: pageBackgroundType,
           background_value: pageBackgroundValue,
+          hide_branding: hideBranding,
         })
         .eq('id', pageId)
 
@@ -330,6 +333,46 @@ export default function EditPagePage() {
                 placeholder="#ffffff atau linear-gradient(...)"
               />
             </div>
+          </div>
+
+          {/* Hide Branding Toggle */}
+          <div className="border-t pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Remove BioLinky Branding
+                </label>
+                <p className="text-xs text-gray-500">
+                  Hide "Dibuat dengan BioLinky" footer from your bio page
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setHideBranding(!hideBranding)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                    hideBranding ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                      hideBranding ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <span className="text-sm text-gray-600">
+                  {hideBranding ? 'Hidden' : 'Visible'}
+                </span>
+              </div>
+            </div>
+            {hideBranding && (
+              <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-xs text-yellow-800">
+                  💰 <strong>Pro Feature:</strong> Remove branding is available for Pro users.
+                  Upgrade to hide BioLinky branding from your public page.
+                </p>
+              </div>
+            )}
           </div>
 
           <button
