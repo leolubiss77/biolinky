@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter, useParams } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import toast, { Toaster } from 'react-hot-toast'
@@ -29,8 +29,8 @@ const THEME_PRESETS: ThemePreset[] = [
     id: 'golden-hour',
     name: 'Golden Hour',
     emoji: '✨',
-    background: 'linear-gradient(160deg, #0c0800 0%, #1c1200 50%, #2a1c00 100%)',
-    themeColor: '#D4AF37',
+    background: 'linear-gradient(160deg, #080500 0%, #120c00 40%, #1c1500 70%, #0e0a00 100%)',
+    themeColor: '#C9A84C',
   },
   {
     id: 'neon-glow',
@@ -115,7 +115,6 @@ type PageData = {
 export default function EditPagePage() {
   const params = useParams()
   const pageId = params.id as string
-  const router = useRouter()
   const supabase = createClient()
 
   const [page, setPage] = useState<PageData | null>(null)
@@ -362,7 +361,6 @@ export default function EditPagePage() {
     )
   }
 
-  const pageUrl = typeof window !== 'undefined' ? `${window.location.origin}/${page.slug}` : ''
   const mostClickedLink = links.reduce((max, link) => (link.clicks > max.clicks ? link : max), links[0])
 
   return (
