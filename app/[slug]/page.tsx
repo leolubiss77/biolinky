@@ -43,7 +43,6 @@ export default function PublicBioPage() {
   const fetchPageData = useCallback(async () => {
     setLoading(true)
     setError(null)
-
     try {
       const { data: pageData, error: pageError } = await supabase
         .from('pages')
@@ -53,11 +52,8 @@ export default function PublicBioPage() {
 
       if (pageError || !pageData) {
         setError('Halaman tidak ditemukan')
-        setPage(null)
-        setLinks([])
         return
       }
-
       setPage(pageData)
 
       const { data: linksData } = await supabase
@@ -91,10 +87,14 @@ export default function PublicBioPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#060912]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 animate-pulse" />
-          <div className="text-gray-500 text-sm">Memuat...</div>
-        </div>
+        <motion.div
+          className="flex flex-col items-center gap-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 animate-pulse" />
+          <p className="text-gray-600 text-xs tracking-widest uppercase">Loading</p>
+        </motion.div>
       </div>
     )
   }
@@ -103,13 +103,8 @@ export default function PublicBioPage() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-[#060912]">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div className="text-gray-400 mb-5 font-medium">{error || 'Halaman tidak ditemukan'}</div>
-          <Link href="/" className="text-sm text-violet-400 hover:text-violet-300 transition font-semibold">
+          <p className="text-gray-400 mb-5">{error || 'Halaman tidak ditemukan'}</p>
+          <Link href="/" className="text-sm text-violet-400 hover:text-violet-300 transition">
             ← Kembali ke BioLinky
           </Link>
         </div>
@@ -128,23 +123,38 @@ export default function PublicBioPage() {
 
   return (
     <div
-      className="min-h-screen flex items-start justify-center p-4 pt-12 pb-16"
+      className="min-h-screen relative flex items-start justify-center p-4 pt-14 pb-20 overflow-hidden"
       style={{ background: page.background_value || '#060912' }}
     >
-      <div className="w-full max-w-lg">
+      {/* Atmospheric background orbs */}
+      <div
+        className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full blur-3xl opacity-15 pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${themeColor}, transparent)` }}
+      />
+      <div
+        className="absolute bottom-1/4 left-1/4 w-64 h-64 rounded-full blur-3xl opacity-10 pointer-events-none"
+        style={{ backgroundColor: themeColor }}
+      />
+
+      <div className="relative w-full max-w-md">
 
         {/* Profile Section */}
         <motion.div
-          className="text-center mb-8"
-          initial={{ opacity: 0, y: -20 }}
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: -24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
         >
           {/* Avatar */}
-          <div className="relative inline-block mb-4">
+          <div className="relative inline-block mb-5">
+            {/* Outer glow ring */}
             <div
-              className="w-24 h-24 rounded-full overflow-hidden mx-auto ring-4 ring-white/15 shadow-2xl"
-              style={{ boxShadow: `0 0 50px ${themeColor}50` }}
+              className="absolute -inset-1.5 rounded-full opacity-40 blur-sm"
+              style={{ background: `radial-gradient(circle, ${themeColor}, transparent)` }}
+            />
+            <div
+              className="relative w-28 h-28 rounded-full overflow-hidden ring-[2.5px] ring-white/20 shadow-2xl"
+              style={{ boxShadow: `0 0 40px ${themeColor}50` }}
             >
               {page.avatar_url ? (
                 <img
@@ -155,36 +165,56 @@ export default function PublicBioPage() {
               ) : (
                 <div
                   className="w-full h-full flex items-center justify-center"
-                  style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}bb)` }}
+                  style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}99)` }}
                 >
-                  <span className="text-4xl font-black text-white">
+                  <span
+                    className="text-4xl font-black text-white"
+                    style={{ fontFamily: 'var(--font-playfair)' }}
+                  >
                     {page.title.charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
             </div>
-            <div className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white/20 shadow-lg" />
+            {/* Online dot */}
+            <div
+              className="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white/30 shadow-lg"
+              style={{ backgroundColor: themeColor }}
+            />
           </div>
 
-          <h1 className="text-2xl font-black text-white mb-1.5 tracking-tight">
+          {/* Name — Playfair Display */}
+          <h1
+            className="text-3xl font-bold text-white mb-2 tracking-wide leading-tight"
+            style={{ fontFamily: 'var(--font-playfair)' }}
+          >
             {page.title}
           </h1>
+
+          {/* Accent line */}
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px w-12 bg-white/15" />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: themeColor }} />
+            <div className="h-px w-12 bg-white/15" />
+          </div>
+
           {page.description && (
-            <p className="text-sm text-gray-400 leading-relaxed max-w-xs mx-auto">
+            <p className="text-sm text-white/50 leading-relaxed max-w-[260px] mx-auto">
               {page.description}
             </p>
           )}
         </motion.div>
 
         {/* Links */}
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-10">
           {visibleLinks.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center"
+              className="rounded-2xl p-10 text-center border border-white/8"
+              style={{ background: 'rgba(255,255,255,0.04)' }}
             >
-              <p className="text-gray-500 text-sm">Belum ada link yang ditambahkan</p>
+              <p className="text-white/30 text-sm">Belum ada link</p>
             </motion.div>
           ) : (
             visibleLinks.map((link, index) => {
@@ -196,12 +226,22 @@ export default function PublicBioPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => handleLinkClick(link.id)}
-                  className="flex items-center gap-4 w-full bg-white/8 hover:bg-white/14 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-white/20 group cursor-pointer"
-                  whileHover={{ scale: 1.02, y: -3, boxShadow: `0 16px 48px ${themeColor}25` }}
-                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-4 w-full rounded-2xl p-4 cursor-pointer group"
+                  style={{
+                    background: 'rgba(255,255,255,0.07)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                  }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.35, delay: index * 0.07 }}
+                  transition={{ duration: 0.35, delay: index * 0.08 }}
+                  whileHover={{
+                    scale: 1.025,
+                    y: -4,
+                    boxShadow: `0 20px 60px ${themeColor}25`,
+                  }}
+                  whileTap={{ scale: 0.97 }}
                 >
                   {/* Icon / Thumbnail */}
                   <div className="relative flex-shrink-0">
@@ -213,7 +253,7 @@ export default function PublicBioPage() {
                           className="w-12 h-12 rounded-xl object-cover"
                         />
                         <div
-                          className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white/20 shadow"
+                          className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border border-white/20 shadow"
                           style={{ backgroundColor: color }}
                         >
                           <Icon size={10} color="white" />
@@ -222,7 +262,10 @@ export default function PublicBioPage() {
                     ) : (
                       <div
                         className="w-12 h-12 rounded-xl flex items-center justify-center"
-                        style={{ backgroundColor: `${color}20`, border: `1px solid ${color}35` }}
+                        style={{
+                          background: `${color}18`,
+                          border: `1px solid ${color}35`,
+                        }}
                       >
                         <Icon size={22} style={{ color }} />
                       </div>
@@ -231,19 +274,26 @@ export default function PublicBioPage() {
 
                   {/* Text */}
                   <div className="flex-1 min-w-0 text-left">
-                    <h3 className="font-bold text-white text-sm">{link.title}</h3>
-                    <p className="text-xs text-gray-500 truncate mt-0.5">{link.url}</p>
+                    <h3
+                      className="font-semibold text-white/90 text-sm leading-tight tracking-wide"
+                      style={{ fontFamily: 'var(--font-playfair)' }}
+                    >
+                      {link.title}
+                    </h3>
+                    <p className="text-xs text-white/35 truncate mt-0.5 font-mono">
+                      {link.url.replace(/^https?:\/\/(www\.)?/, '')}
+                    </p>
                   </div>
 
                   {/* Arrow */}
-                  <svg
-                    className="w-4 h-4 text-gray-600 group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                  <div
+                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center opacity-40 group-hover:opacity-80 transition-all group-hover:translate-x-0.5"
+                    style={{ backgroundColor: `${themeColor}25` }}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </motion.a>
               )
             })
@@ -256,18 +306,18 @@ export default function PublicBioPage() {
             className="text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.7 }}
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-400 transition-colors group"
+              className="inline-flex items-center gap-2 text-xs text-white/20 hover:text-white/40 transition-colors group"
             >
-              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center group-hover:shadow-md group-hover:shadow-violet-500/30 transition-all">
+              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center opacity-60 group-hover:opacity-100 transition-opacity">
                 <span className="text-white font-black text-[9px]">B</span>
               </div>
               <span>
-                Dibuat dengan{' '}
-                <span className="font-bold text-violet-400 group-hover:text-violet-300 transition-colors">
+                Made with{' '}
+                <span className="font-semibold text-white/30 group-hover:text-violet-400 transition-colors">
                   BioLinky
                 </span>
               </span>
