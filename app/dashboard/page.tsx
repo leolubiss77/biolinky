@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import toast, { Toaster } from 'react-hot-toast'
 
 type Page = {
   id: string
@@ -17,8 +17,8 @@ export default function DashboardPage() {
   const [pages, setPages] = useState<Page[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
+  const [userEmail, setUserEmail] = useState<string>('')
   const supabase = createClient()
-  const router = useRouter()
 
   useEffect(() => {
     fetchPages()
@@ -28,6 +28,8 @@ export default function DashboardPage() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+
+      setUserEmail(user.email || '')
 
       const { data, error } = await supabase
         .from('pages')
@@ -58,98 +60,208 @@ export default function DashboardPage() {
 
       const slug = profile?.username || `user-${user.id.slice(0, 8)}`
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('pages')
-        .insert({
-          user_id: user.id,
-          slug: slug,
-          title: 'My Links',
-        })
-        .select()
-        .single()
+        .insert({ user_id: user.id, slug, title: 'My Links' })
 
       if (error) throw error
 
-      alert('Page berhasil dibuat!')
+      toast.success('Page berhasil dibuat!')
       fetchPages()
     } catch (error: any) {
-      alert(error.message)
+      toast.error(error.message || 'Gagal membuat page')
     } finally {
       setCreating(false)
     }
   }
 
+  const firstName = userEmail.split('@')[0] || 'Creator'
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
+        <div className="flex items-center gap-3 text-gray-500">
+          <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          <span>Memuat dashboard...</span>
+        </div>
       </div>
     )
   }
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: { background: '#1e1b2e', color: '#fff', border: '1px solid rgba(139,92,246,0.3)' },
+        }}
+      />
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Kelola semua link-in-bio kamu</p>
+          <h1 className="text-3xl font-black text-white tracking-tight">
+            Halo, <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">{firstName}</span> 👋
+          </h1>
+          <p className="text-gray-500 mt-1 text-sm">Kelola semua link-in-bio kamu di sini</p>
         </div>
         <button
           onClick={createNewPage}
           disabled={creating}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+          className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 disabled:opacity-50 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all duration-200 hover:-translate-y-px text-sm"
         >
-          {creating ? 'Creating...' : '+ Buat Page Baru'}
+          {creating ? (
+            <>
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Membuat...
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
+              Buat Page Baru
+            </>
+          )}
         </button>
       </div>
 
+      {/* Stats Row */}
+      {pages.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+          {[
+            {
+              label: 'Total Pages',
+              value: pages.length,
+              icon: '📄',
+              gradient: 'from-violet-500/15 to-violet-500/5',
+              border: 'border-violet-500/20',
+            },
+            {
+              label: 'Pages Aktif',
+              value: pages.filter(p => p.is_active).length,
+              icon: '✅',
+              gradient: 'from-emerald-500/15 to-emerald-500/5',
+              border: 'border-emerald-500/20',
+            },
+            {
+              label: 'Pages Nonaktif',
+              value: pages.filter(p => !p.is_active).length,
+              icon: '⏸️',
+              gradient: 'from-gray-500/15 to-gray-500/5',
+              border: 'border-gray-500/20',
+            },
+          ].map((stat, i) => (
+            <div key={i} className={`bg-gradient-to-br ${stat.gradient} border ${stat.border} rounded-2xl p-5`}>
+              <div className="text-2xl mb-2">{stat.icon}</div>
+              <div className="text-3xl font-black text-white">{stat.value}</div>
+              <div className="text-gray-500 text-sm font-medium mt-1">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
       {pages.length === 0 ? (
-        <div className="bg-white rounded-xl border-2 border-dashed border-gray-300 p-12 text-center">
-          <div className="text-gray-400 mb-4">
-            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-500/8 to-blue-500/5 p-16 text-center">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl" />
+          <div className="relative">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-600/30 to-blue-600/30 border border-white/10 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-black text-white mb-3">Belum ada page</h3>
+            <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+              Buat Link-in-Bio pertama kamu dan bagikan ke semua platform sosial media dalam hitungan menit.
+            </p>
+            <button
+              onClick={createNewPage}
+              disabled={creating}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all duration-200 hover:-translate-y-px"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
+              {creating ? 'Membuat...' : 'Buat Page Pertama'}
+            </button>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada page</h3>
-          <p className="text-gray-500 mb-6">Mulai dengan membuat Link-in-Bio pertama kamu</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {pages.map((page) => (
+            <div
+              key={page.id}
+              className="group relative bg-gradient-to-br from-white/5 to-white/2 border border-white/10 rounded-2xl p-6 hover:border-violet-500/30 hover:shadow-xl hover:shadow-violet-500/10 transition-all duration-300 hover:-translate-y-1"
+            >
+              {/* Status badge */}
+              <div className="flex items-center justify-between mb-4">
+                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                  page.is_active
+                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25'
+                    : 'bg-gray-500/15 text-gray-400 border border-gray-500/25'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${page.is_active ? 'bg-emerald-400' : 'bg-gray-500'}`} />
+                  {page.is_active ? 'Aktif' : 'Nonaktif'}
+                </div>
+                <Link
+                  href={`/${page.slug}`}
+                  target="_blank"
+                  className="text-gray-500 hover:text-violet-400 transition p-1 rounded-lg hover:bg-white/5"
+                  title="Buka halaman"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </Link>
+              </div>
+
+              {/* Title */}
+              <h3 className="text-lg font-bold text-white mb-1 truncate group-hover:text-violet-300 transition-colors">
+                {page.title}
+              </h3>
+
+              {/* URL */}
+              <div className="flex items-center gap-1.5 mb-5">
+                <div className="w-3 h-3 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex-shrink-0" />
+                <p className="text-xs text-gray-500 truncate font-mono">
+                  biolinky.com/<span className="text-gray-400">{page.slug}</span>
+                </p>
+              </div>
+
+              {/* Actions */}
+              <Link
+                href={`/dashboard/pages/${page.id}`}
+                className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-violet-600/20 to-blue-600/20 hover:from-violet-600/40 hover:to-blue-600/40 border border-violet-500/25 hover:border-violet-500/50 text-violet-300 hover:text-white py-2.5 rounded-xl font-semibold text-sm transition-all duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Page
+              </Link>
+            </div>
+          ))}
+
+          {/* Create new card */}
           <button
             onClick={createNewPage}
             disabled={creating}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+            className="group border-2 border-dashed border-white/10 hover:border-violet-500/40 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-gray-600 hover:text-violet-400 transition-all duration-300 min-h-[180px] hover:bg-violet-500/5"
           >
-            {creating ? 'Creating...' : '+ Buat Page Pertama'}
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pages.map((page) => (
-            <div key={page.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-semibold text-gray-900">{page.title}</h3>
-                <span className={`px-2 py-1 text-xs rounded-full ${page.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                  {page.is_active ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">
-                biolinky.com/<span className="font-mono">{page.slug}</span>
-              </p>
-              <div className="flex gap-2">
-                <Link 
-                  href={`/dashboard/pages/${page.id}`} 
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition"
-                >
-                  Edit
-                </Link>
-                <Link 
-                  href={`/${page.slug}`} 
-                  target="_blank" 
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
-                >
-                  View
-                </Link>
-              </div>
+            <div className="w-12 h-12 rounded-xl bg-white/5 group-hover:bg-violet-500/15 border border-white/10 group-hover:border-violet-500/30 flex items-center justify-center transition-all">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
             </div>
-          ))}
+            <span className="font-semibold text-sm">Buat Page Baru</span>
+          </button>
         </div>
       )}
     </div>

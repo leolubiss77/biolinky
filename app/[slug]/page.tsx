@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { getSocialIcon } from '@/lib/utils/getSocialIcon'
 import { motion } from 'framer-motion'
 
@@ -28,7 +27,7 @@ type PageData = {
   theme_color: string
   background_value: string
   hide_branding: boolean
-  avatar_url: string | null  // ✅ ADDED THIS
+  avatar_url: string | null
 }
 
 export default function PublicBioPage() {
@@ -69,8 +68,8 @@ export default function PublicBioPage() {
         .order('order_position', { ascending: true })
 
       setLinks(linksData || [])
-    } catch (error) {
-      console.error('Error:', error)
+    } catch (err) {
+      console.error('Error:', err)
       setError('Terjadi kesalahan saat memuat halaman')
     } finally {
       setLoading(false)
@@ -83,187 +82,197 @@ export default function PublicBioPage() {
 
   const handleLinkClick = async (linkId: string) => {
     try {
-      const { error } = await supabase.rpc('increment_link_clicks', {
-        link_id: linkId
-      })
-
-      if (error) {
-        console.error('Error tracking click:', error)
-      }
-    } catch (error) {
-      console.error('Error tracking click:', error)
+      await supabase.rpc('increment_link_clicks', { link_id: linkId })
+    } catch (err) {
+      console.error('Error tracking click:', err)
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[#060912]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 animate-pulse" />
+          <div className="text-gray-500 text-sm">Memuat...</div>
+        </div>
       </div>
     )
   }
 
   if (error || !page) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[#060912]">
         <div className="text-center">
-          <div className="text-gray-500 mb-4">{error || 'Halaman tidak ditemukan'}</div>
-          <Link
-            href="/"
-            className="inline-block text-sm text-blue-600 hover:text-blue-800 transition"
-          >
-            Kembali ke halaman utama
+          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="text-gray-400 mb-5 font-medium">{error || 'Halaman tidak ditemukan'}</div>
+          <Link href="/" className="text-sm text-violet-400 hover:text-violet-300 transition font-semibold">
+            ← Kembali ke BioLinky
           </Link>
         </div>
       </div>
     )
   }
 
+  const visibleLinks = links.filter((link) => {
+    const now = new Date()
+    if (link.start_date && new Date(link.start_date) > now) return false
+    if (link.end_date && new Date(link.end_date) < now) return false
+    return true
+  })
+
+  const themeColor = page.theme_color || '#7c3aed'
+
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: page.background_value || '#ffffff' }}
+      className="min-h-screen flex items-start justify-center p-4 pt-12 pb-16"
+      style={{ background: page.background_value || '#060912' }}
     >
-      <div className="w-full max-w-2xl">
-        {/* ✅ UPDATED AVATAR SECTION */}
-        <motion.div 
+      <div className="w-full max-w-lg">
+
+        {/* Profile Section */}
+        <motion.div
           className="text-center mb-8"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          {/* Avatar with Image or Initial */}
-          <div className="mb-4 flex justify-center">
-            {page.avatar_url ? (
-              // Show uploaded avatar
-              <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl">
-                <Image
+          {/* Avatar */}
+          <div className="relative inline-block mb-4">
+            <div
+              className="w-24 h-24 rounded-full overflow-hidden mx-auto ring-4 ring-white/15 shadow-2xl"
+              style={{ boxShadow: `0 0 50px ${themeColor}50` }}
+            >
+              {page.avatar_url ? (
+                <img
                   src={page.avatar_url}
                   alt={page.title}
-                  fill
-                  className="object-cover"
-                  priority
+                  className="w-full h-full object-cover"
                 />
-              </div>
-            ) : (
-              // Show initial letter (fallback)
-              <div 
-                className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl border-4 border-white"
-                style={{
-                  background: page.theme_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white'
-                }}
-              >
-                <span className="text-4xl font-bold">
-                  {page.title.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            )}
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ background: `linear-gradient(135deg, ${themeColor}, ${themeColor}bb)` }}
+                >
+                  <span className="text-4xl font-black text-white">
+                    {page.title.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white/20 shadow-lg" />
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-black text-white mb-1.5 tracking-tight">
             {page.title}
           </h1>
           {page.description && (
-            <p className="text-gray-600">{page.description}</p>
+            <p className="text-sm text-gray-400 leading-relaxed max-w-xs mx-auto">
+              {page.description}
+            </p>
           )}
         </motion.div>
 
-        <div className="space-y-4 mb-8">
-          {!links || links.length === 0 ? (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 text-center">
-              <p className="text-gray-500">Belum ada link yang ditambahkan</p>
-            </div>
+        {/* Links */}
+        <div className="space-y-3 mb-8">
+          {visibleLinks.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white/5 border border-white/10 rounded-2xl p-10 text-center"
+            >
+              <p className="text-gray-500 text-sm">Belum ada link yang ditambahkan</p>
+            </motion.div>
           ) : (
-            links
-              .filter((link) => {
-                const now = new Date()
-                if (link.start_date && new Date(link.start_date) > now) return false
-                if (link.end_date && new Date(link.end_date) < now) return false
-                return true
-              })
-              .map((link) => (
-              <motion.a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => handleLinkClick(link.id)}
-                className="block bg-white/90 backdrop-blur-sm hover:bg-white rounded-2xl p-4 shadow-md"
-                style={{ borderLeft: `4px solid ${page.theme_color || '#3b82f6'}` }}
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="flex items-center gap-4">
+            visibleLinks.map((link, index) => {
+              const { icon: Icon, color } = getSocialIcon(link.url)
+              return (
+                <motion.a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleLinkClick(link.id)}
+                  className="flex items-center gap-4 w-full bg-white/8 hover:bg-white/14 backdrop-blur-sm rounded-2xl p-4 border border-white/10 hover:border-white/20 group cursor-pointer"
+                  whileHover={{ scale: 1.02, y: -3, boxShadow: `0 16px 48px ${themeColor}25` }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: index * 0.07 }}
+                >
+                  {/* Icon / Thumbnail */}
                   <div className="relative flex-shrink-0">
                     {link.thumbnail_url ? (
                       <>
                         <img
                           src={link.thumbnail_url}
                           alt={link.title}
-                          className="w-12 h-12 rounded-lg object-cover"
+                          className="w-12 h-12 rounded-xl object-cover"
                         />
-                        {(() => {
-                          const { icon: Icon, color } = getSocialIcon(link.url)
-                          return (
-                            <div
-                              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-md"
-                              style={{ backgroundColor: color }}
-                            >
-                              <Icon size={12} color="white" />
-                            </div>
-                          )
-                        })()}
+                        <div
+                          className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white/20 shadow"
+                          style={{ backgroundColor: color }}
+                        >
+                          <Icon size={10} color="white" />
+                        </div>
                       </>
                     ) : (
-                      (() => {
-                        const { icon: Icon, color } = getSocialIcon(link.url)
-                        return (
-                          <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center"
-                            style={{ backgroundColor: `${color}20` }}
-                          >
-                            <Icon size={24} style={{ color }} />
-                          </div>
-                        )
-                      })()
+                      <div
+                        className="w-12 h-12 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: `${color}20`, border: `1px solid ${color}35` }}
+                      >
+                        <Icon size={22} style={{ color }} />
+                      </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{link.title}</h3>
-                    <p className="text-sm text-gray-500 truncate">{link.url}</p>
+
+                  {/* Text */}
+                  <div className="flex-1 min-w-0 text-left">
+                    <h3 className="font-bold text-white text-sm">{link.title}</h3>
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{link.url}</p>
                   </div>
+
+                  {/* Arrow */}
                   <svg
-                    className="w-5 h-5 text-gray-400"
+                    className="w-4 h-4 text-gray-600 group-hover:text-gray-400 group-hover:translate-x-0.5 transition-all flex-shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </div>
-              </motion.a>
-            ))
+                </motion.a>
+              )
+            })
           )}
         </div>
 
+        {/* Branding Footer */}
         {!page.hide_branding && (
-          <div className="text-center">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
             <Link
               href="/"
-              className="inline-block text-sm text-gray-600 hover:text-gray-900 transition"
+              className="inline-flex items-center gap-2 text-xs text-gray-600 hover:text-gray-400 transition-colors group"
             >
-              Dibuat dengan <span className="font-bold text-blue-600">BioLinky</span>
+              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center group-hover:shadow-md group-hover:shadow-violet-500/30 transition-all">
+                <span className="text-white font-black text-[9px]">B</span>
+              </div>
+              <span>
+                Dibuat dengan{' '}
+                <span className="font-bold text-violet-400 group-hover:text-violet-300 transition-colors">
+                  BioLinky
+                </span>
+              </span>
             </Link>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

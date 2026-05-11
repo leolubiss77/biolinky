@@ -4,26 +4,30 @@ import Link from 'next/link'
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#060912] text-white overflow-x-hidden">
+
       {/* Navigation */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/8 bg-[#060912]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                <span className="text-white font-black text-sm">B</span>
+              </div>
+              <span className="text-xl font-black bg-gradient-to-r from-violet-300 to-blue-300 bg-clip-text text-transparent tracking-tight">
                 BioLinky
-              </h1>
+              </span>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-2 items-center">
               <Link
                 href="/login"
-                className="text-gray-700 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-100 transition font-medium"
+                className="text-gray-400 hover:text-white px-4 py-2 rounded-xl hover:bg-white/8 transition-all duration-200 font-medium text-sm"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition font-medium"
+                className="bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-5 py-2 rounded-xl font-semibold text-sm transition-all duration-200 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:-translate-y-px"
               >
                 Mulai Gratis
               </Link>
@@ -33,313 +37,326 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 opacity-60" />
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-          <div className="text-center">
+      <section className="relative pt-32 pb-28 px-4 overflow-hidden">
+        {/* Gradient orbs */}
+        <div className="absolute top-16 left-1/4 w-[500px] h-[500px] bg-violet-600/15 rounded-full blur-3xl" />
+        <div className="absolute top-32 right-1/4 w-[400px] h-[400px] bg-blue-600/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-purple-600/10 rounded-full blur-3xl" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="text-center mb-16">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-gray-700">
-                Gratis Selamanya • Tanpa Iklan • Unlimited Links
-              </span>
+            <div className="inline-flex items-center gap-2 mb-8 px-5 py-2 rounded-full border border-violet-500/25 bg-violet-500/8 text-violet-300 text-sm font-medium">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              Gratis Selamanya • Unlimited Links • Tanpa Iklan
             </div>
-            
-            {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Satu Link untuk
+
+            {/* Headline */}
+            <h1 className="text-6xl md:text-8xl font-black mb-6 leading-none tracking-tighter">
+              <span className="text-white">Satu Link untuk</span>
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
-                Semua yang Kamu Bagikan
+              <span className="bg-gradient-to-r from-violet-400 via-fuchsia-400 to-blue-400 bg-clip-text text-transparent">
+                Semua Konten
               </span>
             </h1>
-            
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Platform link-in-bio modern untuk creators, influencers, dan businesses. 
-              Kumpulkan semua link sosial media kamu dalam satu halaman yang cantik.
+
+            <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+              Platform link-in-bio paling canggih untuk creators & brands Indonesia.
+              Cantik, cepat, dan gratis selamanya.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-20">
               <Link
                 href="/signup"
-                className="group relative inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+                className="group flex items-center gap-3 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-1"
               >
-                <span>🚀 Mulai Gratis Sekarang</span>
+                <span>Mulai Gratis Sekarang</span>
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
               <Link
                 href="/cv_saw"
-                className="inline-flex items-center gap-2 bg-white text-gray-700 px-8 py-4 rounded-xl font-semibold text-lg border-2 border-gray-200 hover:border-gray-300 transition shadow-sm hover:shadow-md"
+                className="flex items-center gap-2 text-gray-300 hover:text-white px-8 py-4 rounded-2xl font-semibold border border-white/12 hover:border-white/25 hover:bg-white/5 transition-all duration-300"
               >
-                <span>👀 Lihat Demo</span>
+                <span>Lihat Demo</span>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
               </Link>
             </div>
+          </div>
 
-            {/* Social Proof */}
-            <div className="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Tidak perlu kartu kredit</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Setup dalam 2 menit</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Gratis selamanya</span>
+          {/* Phone Mockup */}
+          <div className="relative mx-auto w-64 md:w-72">
+            <div className="relative rounded-[3rem] border border-white/15 bg-gradient-to-b from-white/8 to-white/3 p-1.5 shadow-2xl">
+              <div className="rounded-[2.6rem] bg-[#0d0f1e] overflow-hidden">
+                {/* Notch */}
+                <div className="flex justify-center pt-3 pb-2">
+                  <div className="w-24 h-5 bg-[#060912] rounded-full" />
+                </div>
+                {/* Bio preview */}
+                <div className="px-5 pb-8">
+                  <div className="flex flex-col items-center mb-5">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white font-black text-2xl mb-3 shadow-xl shadow-violet-500/40 ring-2 ring-white/15">
+                      J
+                    </div>
+                    <div className="text-white font-bold text-sm">@johndoe</div>
+                    <div className="text-white/40 text-xs mt-0.5">Creator & Designer</div>
+                  </div>
+                  {[
+                    { label: 'Instagram', color: '#E4405F', emoji: '📸' },
+                    { label: 'YouTube Channel', color: '#FF0000', emoji: '▶️' },
+                    { label: 'Portfolio Website', color: '#7c3aed', emoji: '💼' },
+                    { label: 'Toko Online', color: '#f59e0b', emoji: '🛍️' },
+                  ].map((link, i) => (
+                    <div
+                      key={i}
+                      className="mb-2.5 rounded-xl p-2.5 flex items-center gap-2.5 border border-white/8"
+                      style={{ background: `${link.color}15` }}
+                    >
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs"
+                        style={{ backgroundColor: `${link.color}25` }}
+                      >
+                        {link.emoji}
+                      </div>
+                      <span className="text-white/75 text-xs font-medium">{link.label}</span>
+                      <svg className="w-3 h-3 text-white/30 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+            {/* Glow */}
+            <div className="absolute -inset-6 bg-violet-500/10 rounded-full blur-3xl -z-10" />
           </div>
         </div>
+      </section>
 
-        {/* Decorative Elements */}
-        <div className="absolute top-40 left-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
+      {/* Stats Bar */}
+      <section className="py-14 px-4 border-y border-white/8">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {[
+            { number: '10K+', label: 'Pengguna Aktif' },
+            { number: '500K+', label: 'Link Dibuat' },
+            { number: '2M+', label: 'Total Klik' },
+            { number: '99.9%', label: 'Uptime' },
+          ].map((stat, i) => (
+            <div key={i}>
+              <div className="text-3xl md:text-4xl font-black bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+                {stat.number}
+              </div>
+              <div className="text-gray-500 text-sm mt-1 font-medium">{stat.label}</div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-24 px-4 bg-white">
+      <section className="py-28 px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Fitur Premium, 100% Gratis
+          <div className="text-center mb-16">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/25 text-violet-400 text-sm font-semibold mb-5 tracking-wide uppercase">
+              Fitur Unggulan
+            </div>
+            <h2 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
+              Semua yang Kamu
+              <br />
+              <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">Butuhkan</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Semua yang kamu butuhkan untuk membuat link-in-bio profesional
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Fitur premium yang biasanya bayar mahal — di BioLinky semua gratis selamanya
             </p>
           </div>
 
-          {/* Feature Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="group relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border border-blue-100">
-              <div className="absolute -top-4 -right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                GRATIS
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                emoji: '📊',
+                title: 'Analytics Real-time',
+                desc: 'Track setiap klik, lihat link paling populer, dan pahami audience kamu dengan data lengkap.',
+                from: 'from-violet-500/15',
+                to: 'to-purple-500/5',
+                border: 'border-violet-500/20',
+                accent: 'text-violet-400',
+              },
+              {
+                emoji: '📱',
+                title: 'QR Code Generator',
+                desc: 'Generate QR code dengan custom warna, download PNG, cetak untuk kartu nama atau event.',
+                from: 'from-blue-500/15',
+                to: 'to-cyan-500/5',
+                border: 'border-blue-500/20',
+                accent: 'text-blue-400',
+              },
+              {
+                emoji: '🎨',
+                title: 'Custom Theme & Gradient',
+                desc: 'Pilih warna brand kamu, buat gradient background unik, dan customize sesuai personality.',
+                from: 'from-fuchsia-500/15',
+                to: 'to-pink-500/5',
+                border: 'border-fuchsia-500/20',
+                accent: 'text-fuchsia-400',
+              },
+              {
+                emoji: '⏰',
+                title: 'Link Scheduling',
+                desc: 'Jadwalkan kapan link muncul dan menghilang. Sempurna untuk promo dan kampanye terbatas.',
+                from: 'from-amber-500/15',
+                to: 'to-orange-500/5',
+                border: 'border-amber-500/20',
+                accent: 'text-amber-400',
+              },
+              {
+                emoji: '🖼️',
+                title: 'Link Thumbnails',
+                desc: 'Tambahkan gambar thumbnail untuk setiap link agar halaman lebih menarik dan profesional.',
+                from: 'from-emerald-500/15',
+                to: 'to-green-500/5',
+                border: 'border-emerald-500/20',
+                accent: 'text-emerald-400',
+              },
+              {
+                emoji: '🔒',
+                title: 'Aman & Terpercaya',
+                desc: 'Data kamu aman dengan enkripsi tingkat bank. Hosting Vercel dengan uptime 99.9% global.',
+                from: 'from-indigo-500/15',
+                to: 'to-blue-500/5',
+                border: 'border-indigo-500/20',
+                accent: 'text-indigo-400',
+              },
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className={`relative group rounded-2xl p-6 bg-gradient-to-br ${feature.from} ${feature.to} border ${feature.border} hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/30`}
+              >
+                <div className="absolute -top-3 -right-3 bg-gradient-to-r from-violet-600 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-violet-500/30">
+                  GRATIS
+                </div>
+                <div className="text-3xl mb-4">{feature.emoji}</div>
+                <h3 className={`text-lg font-bold text-white mb-2`}>{feature.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Analytics Real-time
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Track setiap klik, lihat link mana yang paling populer, dan pahami audience kamu dengan analytics lengkap.
-              </p>
-            </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Feature 2 */}
-            <div className="group relative bg-gradient-to-br from-purple-50 to-purple-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border border-purple-100">
-              <div className="absolute -top-4 -right-4 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                GRATIS
-              </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                QR Code Generator
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Generate QR code dengan custom warna, download PNG, dan cetak untuk kartu nama atau poster event kamu.
-              </p>
+      {/* How It Works */}
+      <section className="py-24 px-4 border-t border-white/8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-400 text-sm font-semibold mb-5 tracking-wide uppercase">
+              Cara Kerja
             </div>
-
-            {/* Feature 3 */}
-            <div className="group relative bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border border-pink-100">
-              <div className="absolute -top-4 -right-4 bg-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                GRATIS
+            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              3 Langkah, Langsung Jalan
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: '01',
+                title: 'Daftar Gratis',
+                desc: 'Buat akun dalam 30 detik dengan email atau Google. Tidak perlu kartu kredit.',
+              },
+              {
+                step: '02',
+                title: 'Tambah Links',
+                desc: 'Tambahkan semua link sosial media, portfolio, toko online, dan apapun yang ingin kamu bagikan.',
+              },
+              {
+                step: '03',
+                title: 'Share ke Dunia',
+                desc: 'Dapatkan link unik dan bagikan ke semua profil sosial media kamu. Selesai!',
+              },
+            ].map((item, i) => (
+              <div key={i} className="text-center group">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600/20 to-blue-600/20 border border-white/10 mb-5 group-hover:border-violet-500/40 transition-all">
+                  <span className="text-2xl font-black bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+                    {item.step}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Custom Theme & Gradient
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Pilih warna brand kamu, buat gradient background yang unik, dan customize halaman sesuai personality kamu.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="group bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border border-green-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Setup Super Cepat
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Daftar, tambah link, dan publish dalam 2 menit. Tidak ada setup rumit atau konfigurasi yang membingungkan.
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="group bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border border-yellow-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Link Thumbnails
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Tambahkan gambar thumbnail untuk setiap link supaya halaman kamu lebih menarik dan profesional.
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="group bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border border-indigo-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                Aman & Terpercaya
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Data kamu aman dengan enkripsi tingkat bank. Hosting di Vercel dengan uptime 99.9% dan performance global.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-24 px-4 overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600" />
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yIDItNCAyLTRzMiAyIDIgNHYyYzAgMi0yIDQtMiA0cy0yLTItMi00di0yem0wLTMwYzAtMiAyLTQgMi00czIgMiAyIDR2MmMwIDItMiA0LTIgNHMtMi0yLTItNFY0ek00IDM2YzItMCA0LTIgNC0yczItMiA0LTJoMmMyIDAgNCAyIDQgMnMyIDIgMiA0djJjMCAyLTIgNC0yIDRzLTItMi00LTJoLTJjLTIgMC00IDItNCAycy0yIDItNCAydjJjMCAyLTIgNC0yIDRzLTItMi0yLTR2LTJjMC0yIDItNCAyLTRzMi0yIDItNHYtMmMwLTItMi00LTItNHMtMi0yLTItNHYtMmMwLTIgMi00IDItNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-10" />
-        
-        <div className="relative max-w-4xl mx-auto text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Siap untuk Memulai?
+      <section className="relative py-28 px-4 overflow-hidden border-t border-white/8">
+        <div className="absolute top-0 left-1/3 w-[400px] h-[400px] bg-violet-600/15 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] bg-blue-600/15 rounded-full blur-3xl" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <h2 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tighter">
+            Siap{' '}
+            <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+              Memulai?
+            </span>
           </h2>
-          <p className="text-xl md:text-2xl mb-10 opacity-90">
+          <p className="text-xl text-gray-400 mb-10">
             Join ribuan creators yang sudah menggunakan BioLinky untuk mengembangkan audience mereka.
           </p>
           <Link
             href="/signup"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-10 py-5 rounded-xl hover:bg-gray-50 transition font-bold text-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-1"
+            className="group inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-1"
           >
-            <span>🚀 Mulai Gratis Sekarang</span>
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span>Mulai Gratis Sekarang</span>
+            <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
-          <p className="mt-6 text-sm opacity-75">
+          <p className="mt-6 text-gray-600 text-sm">
             Tidak perlu kartu kredit • Gratis selamanya • Setup 2 menit
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200 py-12 px-4">
+      <footer className="border-t border-white/8 py-14 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Brand */}
+          <div className="grid md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-2">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text mb-4">
-                BioLinky
-              </h3>
-              <p className="text-gray-600 leading-relaxed mb-4">
-                Platform link-in-bio modern untuk creators, influencers, dan businesses. 
-                Semua fitur premium, 100% gratis selamanya.
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                  <span className="text-white font-black text-sm">B</span>
+                </div>
+                <span className="text-xl font-black bg-gradient-to-r from-violet-300 to-blue-300 bg-clip-text text-transparent">
+                  BioLinky
+                </span>
+              </div>
+              <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+                Platform link-in-bio modern untuk creators, influencers, dan businesses. Semua fitur premium, 100% gratis selamanya.
               </p>
             </div>
-            
-            {/* Links */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Product</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/signup" className="text-gray-600 hover:text-blue-600 transition">
-                    Mulai Gratis
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/cv_saw" className="text-gray-600 hover:text-blue-600 transition">
-                    Lihat Demo
-                  </Link>
-                </li>
+              <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Product</h4>
+              <ul className="space-y-3">
+                <li><Link href="/signup" className="text-gray-500 hover:text-violet-400 transition text-sm">Mulai Gratis</Link></li>
+                <li><Link href="/cv_saw" className="text-gray-500 hover:text-violet-400 transition text-sm">Lihat Demo</Link></li>
               </ul>
             </div>
-            
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4">Account</h4>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/login" className="text-gray-600 hover:text-blue-600 transition">
-                    Login
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/signup" className="text-gray-600 hover:text-blue-600 transition">
-                    Sign Up
-                  </Link>
-                </li>
+              <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Account</h4>
+              <ul className="space-y-3">
+                <li><Link href="/login" className="text-gray-500 hover:text-violet-400 transition text-sm">Login</Link></li>
+                <li><Link href="/signup" className="text-gray-500 hover:text-violet-400 transition text-sm">Sign Up</Link></li>
               </ul>
             </div>
           </div>
-          
-          {/* Bottom */}
-          <div className="border-t border-gray-200 pt-8 text-center">
-            <p className="text-gray-500 text-sm">
-              © 2026 BioLinky. Made with <span className="text-red-500">❤️</span> for creators everywhere.
+          <div className="border-t border-white/8 pt-8 text-center">
+            <p className="text-gray-600 text-sm">
+              © 2026 BioLinky. Made with ❤️ for creators everywhere.
             </p>
           </div>
         </div>
       </footer>
-
-      {/* Custom Animations */}
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   )
 }
