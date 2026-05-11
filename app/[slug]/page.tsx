@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getSocialIcon } from '@/lib/utils/getSocialIcon'
 import { motion } from 'framer-motion'
 
@@ -27,6 +28,7 @@ type PageData = {
   theme_color: string
   background_value: string
   hide_branding: boolean
+  avatar_url: string | null  // ✅ ADDED THIS
 }
 
 export default function PublicBioPage() {
@@ -123,19 +125,49 @@ export default function PublicBioPage() {
       style={{ background: page.background_value || '#ffffff' }}
     >
       <div className="w-full max-w-2xl">
-        <div className="text-center mb-8">
-          <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-            <span className="text-4xl font-bold" style={{ color: page.theme_color || '#3b82f6' }}>
-              {page.title.charAt(0)}
-            </span>
+        {/* ✅ UPDATED AVATAR SECTION */}
+        <motion.div 
+          className="text-center mb-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          {/* Avatar with Image or Initial */}
+          <div className="mb-4 flex justify-center">
+            {page.avatar_url ? (
+              // Show uploaded avatar
+              <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-xl">
+                <Image
+                  src={page.avatar_url}
+                  alt={page.title}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            ) : (
+              // Show initial letter (fallback)
+              <div 
+                className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl border-4 border-white"
+                style={{
+                  background: page.theme_color || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white'
+                }}
+              >
+                <span className="text-4xl font-bold">
+                  {page.title.charAt(0).toUpperCase()}
+                </span>
+              </div>
+            )}
           </div>
+
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             {page.title}
           </h1>
           {page.description && (
             <p className="text-gray-600">{page.description}</p>
           )}
-        </div>
+        </motion.div>
 
         <div className="space-y-4 mb-8">
           {!links || links.length === 0 ? (
