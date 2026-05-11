@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { getSocialIcon } from '@/lib/utils/getSocialIcon'
 
 type PageLink = {
   id: string
@@ -149,12 +150,24 @@ export default function PublicBioPage() {
                 style={{ borderLeft: `4px solid ${page.theme_color || '#3b82f6'}` }}
               >
                 <div className="flex items-center gap-4">
-                  {link.thumbnail_url && (
+                  {link.thumbnail_url ? (
                     <img
                       src={link.thumbnail_url}
                       alt={link.title}
-                      className="w-12 h-12 rounded-lg object-cover"
+                      className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                     />
+                  ) : (
+                    (() => {
+                      const { icon: Icon, color } = getSocialIcon(link.url)
+                      return (
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: `${color}20` }}
+                        >
+                          <Icon size={24} style={{ color }} />
+                        </div>
+                      )
+                    })()
                   )}
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900">{link.title}</h3>
