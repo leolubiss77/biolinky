@@ -2,9 +2,62 @@
 
 import Link from 'next/link'
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://biolinky.vercel.app/#website",
+      "url": "https://biolinky.vercel.app",
+      "name": "BioLinky",
+      "description": "Platform link-in-bio gratis terbaik untuk creators Indonesia",
+      "inLanguage": "id-ID",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://biolinky.vercel.app/{search_term_string}",
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://biolinky.vercel.app/#organization",
+      "name": "BioLinky",
+      "url": "https://biolinky.vercel.app",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://biolinky.vercel.app/favicon.ico",
+      },
+      "sameAs": [],
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "BioLinky",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "IDR",
+      },
+      "description":
+        "BioLinky adalah platform link-in-bio gratis untuk creators, influencers, dan businesses Indonesia. Analytics real-time, QR code, custom theme — 100% gratis selamanya.",
+      "url": "https://biolinky.vercel.app",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "500",
+      },
+    },
+  ],
+}
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#060912] text-white overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/8 bg-[#060912]/80 backdrop-blur-xl">
@@ -338,7 +391,9 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold text-white mb-4 text-sm uppercase tracking-wider">Product</h4>
               <ul className="space-y-3">
-                <li><Link href="/signup" className="text-gray-500 hover:text-violet-400 transition text-sm">Mulai Gratis</Link></li>
+                <li><Link href="/features" className="text-gray-500 hover:text-violet-400 transition text-sm">Fitur</Link></li>
+                <li><Link href="/pricing" className="text-gray-500 hover:text-violet-400 transition text-sm">Harga</Link></li>
+                <li><Link href="/about" className="text-gray-500 hover:text-violet-400 transition text-sm">Tentang</Link></li>
                 <li><Link href="/cv_saw" className="text-gray-500 hover:text-violet-400 transition text-sm">Lihat Demo</Link></li>
               </ul>
             </div>

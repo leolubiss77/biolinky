@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /pricing
+Allow: /about
+
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /auth/*
+Disallow: /api/*
+
+Sitemap: https://biolinky.vercel.app/sitemap.xml
