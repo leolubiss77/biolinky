@@ -23,6 +23,7 @@ type PageData = {
   description: string | null
   theme_color: string
   background_value: string
+  hide_branding: boolean
 }
 
 export default function PublicBioPage() {
@@ -207,14 +208,16 @@ export default function PublicBioPage() {
           )}
         </div>
 
-        <div className="text-center">
-          <Link
-            href="/"
-            className="inline-block text-sm text-gray-600 hover:text-gray-900 transition"
-          >
-            Dibuat dengan <span className="font-bold text-blue-600">BioLinky</span>
-          </Link>
-        </div>
+        {!page.hide_branding && (
+          <div className="text-center">
+            <Link
+              href="/"
+              className="inline-block text-sm text-gray-600 hover:text-gray-900 transition"
+            >
+              Dibuat dengan <span className="font-bold text-blue-600">BioLinky</span>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
