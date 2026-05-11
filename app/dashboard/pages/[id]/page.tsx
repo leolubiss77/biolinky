@@ -1,12 +1,94 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import toast, { Toaster } from 'react-hot-toast'
-import AvatarUpload from '@/components/AvatarUpload'  // ✅ ADDED
+import AvatarUpload from '@/components/AvatarUpload'
+import { getSocialIcon } from '@/lib/utils/getSocialIcon'
+
+type ThemePreset = {
+  id: string
+  name: string
+  emoji: string
+  background: string
+  themeColor: string
+}
+
+const THEME_PRESETS: ThemePreset[] = [
+  {
+    id: 'dark-elegant',
+    name: 'Dark Elegant',
+    emoji: '⚫',
+    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+    themeColor: '#D4AF37',
+  },
+  {
+    id: 'minimal-white',
+    name: 'Minimal White',
+    emoji: '⚪',
+    background: '#f8f9fa',
+    themeColor: '#1a1a1a',
+  },
+  {
+    id: 'ocean-breeze',
+    name: 'Ocean Breeze',
+    emoji: '🌊',
+    background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+    themeColor: '#00d2ff',
+  },
+  {
+    id: 'sunset-vibes',
+    name: 'Sunset Vibes',
+    emoji: '🌅',
+    background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #fda085 100%)',
+    themeColor: '#ffffff',
+  },
+  {
+    id: 'forest-green',
+    name: 'Forest Green',
+    emoji: '🌲',
+    background: 'linear-gradient(135deg, #134e5e 0%, #1a3a2a 100%)',
+    themeColor: '#4ade80',
+  },
+  {
+    id: 'rose-gold',
+    name: 'Rose Gold',
+    emoji: '🌹',
+    background: 'linear-gradient(135deg, #2d1b33 0%, #3d2040 100%)',
+    themeColor: '#e8a598',
+  },
+  {
+    id: 'neon-glow',
+    name: 'Neon Glow',
+    emoji: '⚡',
+    background: 'linear-gradient(135deg, #0a0010 0%, #050510 100%)',
+    themeColor: '#a855f7',
+  },
+  {
+    id: 'pastel-dream',
+    name: 'Pastel Dream',
+    emoji: '🎀',
+    background: 'linear-gradient(135deg, #fce4ec 0%, #e8eaf6 50%, #e0f7fa 100%)',
+    themeColor: '#ec4899',
+  },
+  {
+    id: 'golden-hour',
+    name: 'Golden Hour',
+    emoji: '✨',
+    background: 'linear-gradient(135deg, #1a0533 0%, #2d1b00 50%, #1a0010 100%)',
+    themeColor: '#fbbf24',
+  },
+  {
+    id: 'custom',
+    name: 'Custom',
+    emoji: '✏️',
+    background: '',
+    themeColor: '',
+  },
+]
 
 type PageLink = {
   id: string
@@ -47,12 +129,15 @@ export default function EditPagePage() {
   })
   const [saving, setSaving] = useState(false)
   const [editingLink, setEditingLink] = useState<PageLink | null>(null)
+  const [thumbnailUploading, setThumbnailUploading] = useState(false)
+  const thumbnailInputRef = useRef<HTMLInputElement>(null)
   const [pageTitle, setPageTitle] = useState('')
   const [pageDescription, setPageDescription] = useState('')
   const [pageThemeColor, setPageThemeColor] = useState('#3b82f6')
   const [pageBackgroundType, setPageBackgroundType] = useState('solid')
   const [pageBackgroundValue, setPageBackgroundValue] = useState('#ffffff')
   const [hideBranding, setHideBranding] = useState(false)
+  const [selectedThemeId, setSelectedThemeId] = useState('custom')
   const [qrCodeUrl, setQrCodeUrl] = useState('')
   const [qrForeground, setQrForeground] = useState('#000000')
   const [qrBackground, setQrBackground] = useState('#ffffff')
@@ -130,6 +215,47 @@ export default function EditPagePage() {
     }
   }
 
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !editingLink) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('File harus berupa gambar!')
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Ukuran file maksimal 2MB!')
+      return
+    }
+
+    setThumbnailUploading(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `thumbnails/${user.id}/${editingLink.id}-${Date.now()}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { cacheControl: '3600', upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName)
+
+      setEditingLink({ ...editingLink, thumbnail_url: publicUrl })
+      toast.success('Foto berhasil diupload!')
+    } catch (error: any) {
+      toast.error(`Upload gagal: ${error.message}`)
+    } finally {
+      setThumbnailUploading(false)
+      if (thumbnailInputRef.current) thumbnailInputRef.current.value = ''
+    }
+  }
+
   const handleUpdateLink = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingLink) return
@@ -178,6 +304,14 @@ export default function EditPagePage() {
       toast.error(error.message)
     } finally {
       setSaving(false)
+    }
+  }
+
+  const applyPreset = (theme: ThemePreset) => {
+    setSelectedThemeId(theme.id)
+    if (theme.id !== 'custom') {
+      setPageThemeColor(theme.themeColor)
+      setPageBackgroundValue(theme.background)
     }
   }
 
@@ -284,21 +418,72 @@ export default function EditPagePage() {
                   <textarea value={pageDescription} onChange={(e) => setPageDescription(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows={3} placeholder="Bio singkat tentang kamu" />
                 </div>
+                {/* Theme Picker */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Warna Tema</label>
-                  <div className="flex gap-2 items-center">
-                    <input type="color" value={pageThemeColor} onChange={(e) => setPageThemeColor(e.target.value)} className="h-10 w-20 rounded border border-gray-300" />
-                    <input type="text" value={pageThemeColor} onChange={(e) => setPageThemeColor(e.target.value)}
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="#3b82f6" />
+                  <label className="block text-sm font-medium text-gray-700 mb-3">🎨 Pilih Theme</label>
+                  <div className="grid grid-cols-5 gap-2 mb-2">
+                    {THEME_PRESETS.map((theme) => (
+                      <button
+                        key={theme.id}
+                        type="button"
+                        onClick={() => applyPreset(theme)}
+                        className={`relative rounded-xl overflow-hidden transition-all duration-200 ${
+                          selectedThemeId === theme.id
+                            ? 'ring-2 ring-violet-500 ring-offset-2 scale-105 shadow-lg shadow-violet-500/20'
+                            : 'border border-gray-200 hover:scale-105 hover:shadow-md hover:border-violet-300'
+                        }`}
+                      >
+                        {theme.id === 'custom' ? (
+                          <div className="h-12 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                            <span className="text-lg">✏️</span>
+                          </div>
+                        ) : (
+                          <div className="h-12" style={{ background: theme.background }} />
+                        )}
+                        <div className="bg-white px-1 py-1 flex items-center gap-1">
+                          <div
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0 border border-gray-200"
+                            style={{
+                              backgroundColor: theme.id === 'custom' ? pageThemeColor : theme.themeColor,
+                            }}
+                          />
+                          <span className="text-[9px] text-gray-600 truncate font-medium leading-tight">{theme.name}</span>
+                        </div>
+                        {selectedThemeId === theme.id && (
+                          <div className="absolute top-1 right-1 w-4 h-4 bg-violet-500 rounded-full flex items-center justify-center">
+                            <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                        )}
+                      </button>
+                    ))}
                   </div>
+                  <p className="text-xs text-gray-400">
+                    {selectedThemeId === 'custom' ? 'Mode custom — atur warna manual di bawah.' : `Theme "${THEME_PRESETS.find(t => t.id === selectedThemeId)?.name}" dipilih. Klik Simpan untuk menerapkan.`}
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Background</label>
-                  <input type="text" value={pageBackgroundValue} onChange={(e) => setPageBackgroundValue(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" />
-                  <p className="text-xs text-gray-500 mt-1">Gunakan warna hex (#99ff00) atau gradient CSS</p>
-                </div>
+
+                {/* Custom inputs — hanya tampil bila Custom dipilih */}
+                {selectedThemeId === 'custom' && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Warna Aksen</label>
+                      <div className="flex gap-2 items-center">
+                        <input type="color" value={pageThemeColor} onChange={(e) => setPageThemeColor(e.target.value)} className="h-10 w-20 rounded border border-gray-300 cursor-pointer" />
+                        <input type="text" value={pageThemeColor} onChange={(e) => setPageThemeColor(e.target.value)}
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="#3b82f6" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Background</label>
+                      <input type="text" value={pageBackgroundValue} onChange={(e) => setPageBackgroundValue(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                        placeholder="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" />
+                      <p className="text-xs text-gray-500 mt-1">Gunakan hex (#99ff00) atau CSS gradient</p>
+                    </div>
+                  </>
+                )}
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
                     <h3 className="font-medium text-gray-900">Remove BioLinky Branding</h3>
@@ -359,8 +544,21 @@ export default function EditPagePage() {
                 <div className="space-y-4">
                   {links.map((link) => (
                     <div key={link.id} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-4">
-                      {link.thumbnail_url && (
-                        <img src={link.thumbnail_url} alt={link.title} className="w-16 h-16 rounded-lg object-cover" />
+                      {/* Thumbnail atau logo platform */}
+                      {link.thumbnail_url ? (
+                        <img src={link.thumbnail_url} alt={link.title} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" />
+                      ) : (
+                        (() => {
+                          const { icon: Icon, color } = getSocialIcon(link.url)
+                          return (
+                            <div
+                              className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                              style={{ backgroundColor: `${color}18`, border: `1px solid ${color}40` }}
+                            >
+                              <Icon size={22} style={{ color }} />
+                            </div>
+                          )
+                        })()
                       )}
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -408,9 +606,75 @@ export default function EditPagePage() {
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
-                      <input type="url" value={editingLink.thumbnail_url || ''} onChange={(e) => setEditingLink({ ...editingLink, thumbnail_url: e.target.value })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Foto Thumbnail</label>
+                      <div className="flex items-center gap-4">
+                        {/* Preview: foto atau logo platform */}
+                        <div className="relative flex-shrink-0">
+                          {editingLink.thumbnail_url ? (
+                            <img
+                              src={editingLink.thumbnail_url}
+                              alt="thumbnail"
+                              className="w-16 h-16 rounded-xl object-cover border border-gray-200"
+                            />
+                          ) : (
+                            (() => {
+                              const { icon: Icon, color } = getSocialIcon(editingLink.url)
+                              return (
+                                <div
+                                  className="w-16 h-16 rounded-xl flex items-center justify-center border"
+                                  style={{ backgroundColor: `${color}18`, borderColor: `${color}40` }}
+                                >
+                                  <Icon size={28} style={{ color }} />
+                                </div>
+                              )
+                            })()
+                          )}
+                          {thumbnailUploading && (
+                            <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+                              <svg className="w-5 h-5 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Tombol upload / hapus */}
+                        <div className="flex flex-col gap-2">
+                          <button
+                            type="button"
+                            disabled={thumbnailUploading}
+                            onClick={() => thumbnailInputRef.current?.click()}
+                            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+                          >
+                            {editingLink.thumbnail_url ? 'Ganti Foto' : 'Upload Foto'}
+                          </button>
+                          {editingLink.thumbnail_url && (
+                            <button
+                              type="button"
+                              onClick={() => setEditingLink({ ...editingLink, thumbnail_url: null })}
+                              className="px-4 py-2 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition"
+                            >
+                              Hapus Foto
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Hidden file input */}
+                      <input
+                        ref={thumbnailInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleThumbnailUpload}
+                        className="hidden"
+                      />
+
+                      {!editingLink.thumbnail_url && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          Jika tidak diupload, logo {getSocialIcon(editingLink.url).name} akan digunakan otomatis.
+                        </p>
+                      )}
                     </div>
                     <div className="border-t pt-4">
                       <h4 className="text-sm font-semibold text-gray-700 mb-3">⏰ Schedule Link (Optional)</h4>
